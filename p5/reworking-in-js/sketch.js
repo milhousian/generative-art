@@ -6,7 +6,7 @@ var array_of_reds = [];
 var array_of_greens = [];
 
 // jeez, okay, so technically the globals get declared first?
-var number_rows = 80;
+var number_rows = 5;
 var row_height = 0; // we're just going to calculate this in a second in setup()
 
 
@@ -25,14 +25,13 @@ function setup() {
 
 
 function draw() {
-		
 	// every frame, grab all the reds greens and blues
 	// wow, this works
 	for(var x = 0; x < array_of_orgs.length; x++){
 		array_of_reds[x] = array_of_orgs[x].now_red;
 		array_of_greens[x] = array_of_orgs[x].now_green;
 		array_of_blues[x] = array_of_orgs[x].now_blue;
-		
+
 		// let's just... check that everything is kosher here
 		// !!! everything is not kosher
 		// Average for reds is consistently ~120, when you'd expect it'd be higher
@@ -53,8 +52,13 @@ function draw() {
 // 		print("current green average is ", avg);
 		
 	}
+// 			print(array_of_reds);
+// 		print(array_of_orgs);
+// 		debugger;
 
 	// then, for each organism
+	
+	
 	for (var i = 0; i < array_of_orgs.length; i++){
 		let tempOrg = array_of_orgs[i];
 
@@ -68,36 +72,26 @@ function draw() {
 		var temp_prev_green=0;
 		var temp_prev_blue=0;
 		var y = array_of_orgs.length;
-		var z = 0;
 	
-		
-		// OKAY AND THIS IS WHERE I AM STUCK
-		// the array looks fine, it's stocked
-// 		print(typeof array_of_reds[0]);
-// 		print("prev red is a ", typeof temp_prev_red);
-		
-		 if (i==0){
+		// grab the previous colors
+		// if it's the first one, go grab it from the last one
+		 if (i===0){
 			temp_prev_red = array_of_reds[y-1];
 			temp_prev_green = array_of_greens[y-1];
-			temp_prev_blues = array_of_blues[y-1];
+			temp_prev_blue = array_of_blues[y-1];
 		} else {
-			temp_prev_red = array_of_reds[i-1].now_red;
-			temp_prev_green = array_of_orgs[(i-1)].now_green;
-			temp_prev_red = array_of_orgs[(i-1)].now_green;
+			temp_prev_red = array_of_reds[i-1];
+			temp_prev_green = array_of_greens[(i-1)];
+			temp_prev_blue = array_of_blues[(i-1)];
 		}
-	
+
+		// grab the next colors	
 		// if it's the last one, we want it to go get the first ones
-		if (i==(y-1)){
-		// TODO THIS DID NOT WORK
-		// ??? why can't I call this as array[0] ???
-// 			print("we're going to go grab...", array_of_reds[0].now_red)
-// 			print(array_of_reds);
-			temp_next_red = array_of_reds[z].now_red;
-			temp_next_green = array_of_greens[z].now_green;
-			temp_next_red = array_of_blues[z].now_green;
-// 			temp_next_red = 128;
-// 			temp_next_green =128;
-// 			temp_next_blue = 128;
+		if (i===(y-1)){
+// 			print(array_of_reds[0], typeof array_of_reds[0]);
+			temp_next_red = array_of_reds[0];
+			temp_next_green = array_of_greens[0];
+			temp_next_blue = array_of_blues[0];
 		} else {
 			temp_next_red = array_of_reds[i+1];
 			temp_next_green = array_of_greens[i+1];
@@ -105,12 +99,13 @@ function draw() {
 
 		}
 		// now that those are all populated...
- 		print("red is currently", tempOrg.now_red, "calling to update your colors, with", temp_prev_red, temp_next_red);
+//  		print("red is currently", tempOrg.now_red, "calling to update your colors, with", temp_prev_red, temp_next_red);
 
 		// so my intent here is to call the object, pass it a bunch of info, and then let it calculate it out
 		tempOrg.updateYourColors(temp_prev_red, temp_prev_green, temp_prev_blue, temp_next_red, temp_next_green, temp_next_blue);
-	  	
 	  }
+// 		print(array_of_orgs[4]);
+// 		debugger;
 }
 
 
@@ -125,8 +120,8 @@ function createOrgs(){
 
 function calcthatcolordrift(truecolor, precolor, nextcolor){
 	let varcolor = 0;
-	varcolor = int((precolor + nextcolor)*2 + (truecolor * 6))/10	
-//	varcolor = (int(((truecolor*4)+(precolor*3)+(nextcolor*3))/10))+(int(random(-20,20)));
+	varcolor = int((truecolor+precolor+nextcolor)/3)	
+	return varcolor;
 // 	print(truecolor, precolor, nextcolor, varcolor);
 
 
@@ -138,5 +133,5 @@ function calcthatcolordrift(truecolor, precolor, nextcolor){
 // 	firstdelta = 180%(truecolor - precolor);
 // 	secondelta = 180%(truecolor - nextcolor);
 // 	varcolor = firstdelta + seconddelta;
-	return varcolor;
+
 }

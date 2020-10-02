@@ -7,7 +7,7 @@ var array_of_hues = [];
 var array_of_true_hues = [];
 
 // jeez, okay, so technically the globals get declahue first?
-var number_rows = 10;
+var number_rows = 20;
 var row_height = 0; // we're just going to calculate this in a second in setup()
 
 

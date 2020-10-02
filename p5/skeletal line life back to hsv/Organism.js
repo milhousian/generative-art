@@ -170,7 +170,7 @@ function Org(){
 		push();
 		translate(0, (iteration*row_height));
 		strokeWeight(10);
-		stroke(0,0,100);
+		stroke(0,0,50);
 		fill(this.now_hue, this.now_sat, this.now_bright);
 		rect(centerx, centery, rect_width, rect_height);
 		pop();

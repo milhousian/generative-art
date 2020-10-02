@@ -11,6 +11,7 @@ function Org(){
 	this.adherence = round(random(0.5,1),2); // how much does it want to stay towards its true hue
 	this.neighbor_distance = 999;
 	this.true_self_drift = 999;
+	this.width_percent = random(0.5,1);
 	
 	
 	this.updateYourSatBright = function(){
@@ -154,19 +155,25 @@ function Org(){
 
 
 // TODO? this could be pulled out and into a thing
-// seems to work
+// update: now uses translate to draw at a relative position, and well as fixing a draw issue
 	this.drawSelf = function(iteration){
-		let startx
-		let starty;
-		let targetx
-		let targety;
-		startx = 0;
-		starty = 0 + (iteration * row_height);
-		targetx = width;
-		targety = (starty + row_height);
-		noStroke();
+		rectMode(CENTER);
+		// CORNER = first two are upper left x,y, next are width and height
+		// CORNERS = first two are one corner, third fourth are opposite corner 
+		// CENTER = first two are the center point, third fourth are width height
+
+// == Attempt to use CENTER ==
+		let centerx = (width/2);
+		let centery = (row_height/2);
+		let rect_width = width*this.width_percent;
+		let rect_height = row_height;		
+		push();
+		translate(0, (iteration*row_height));
+		strokeWeight(10);
+		stroke(0,0,100);
 		fill(this.now_hue, this.now_sat, this.now_bright);
-		rect(startx, starty, targetx, targety);
+		rect(centerx, centery, rect_width, rect_height);
+		pop();
 	}
 
 }

@@ -7,13 +7,13 @@ var array_of_hues = [];
 var array_of_true_hues = [];
 
 // jeez, okay, so technically the globals get declahue first?
-var number_rows = 40;
+var number_rows = 10;
 var row_height = 0; // we're just going to calculate this in a second in setup()
 
 
 function setup() {
 	createCanvas(800,800);
-	frameRate(20);
+	frameRate(10);
 	// HSB color mode defaults to 360, 100, 100
 	colorMode(HSB);
 	background(255,0,0);

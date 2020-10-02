@@ -12,7 +12,7 @@ var row_height = 0; // we're just going to calculate this in a second in setup()
 
 
 function setup() {
-	createCanvas(800,200);
+	createCanvas(800,800);
 	frameRate(20);
 	// HSB color mode defaults to 360, 100, 100
 	colorMode(HSB);
@@ -40,19 +40,19 @@ function draw() {
 
 	// DEBUGGING SECTION
 	// uncomment this to get a running average of the hue values
-	var cur_total = 0;
-	for(var n = 0; n < array_of_hues.length; n++){
-		cur_total += array_of_hues[n];
-	}
-	var cur_avg = cur_total / array_of_hues.length;
-	
-	var true_total = 0;
-	for(var n = 0; n < array_of_true_hues.length; n++){
-		true_total += array_of_true_hues[n];
-	}
-	var true_avg = true_total / array_of_true_hues.length;
-	
-	print("current hue average is ", cur_avg, " true hue avg is ", true_avg);	
+// 	var cur_total = 0;
+// 	for(var n = 0; n < array_of_hues.length; n++){
+// 		cur_total += array_of_hues[n];
+// 	}
+// 	var cur_avg = cur_total / array_of_hues.length;
+// 	
+// 	var true_total = 0;
+// 	for(var n = 0; n < array_of_true_hues.length; n++){
+// 		true_total += array_of_true_hues[n];
+// 	}
+// 	var true_avg = true_total / array_of_true_hues.length;
+// 	
+// 	print("current hue average is ", cur_avg, " true hue avg is ", true_avg);	
 
 	// more random debugging stuff
 	// 			print(array_of_hues);
@@ -92,6 +92,7 @@ function draw() {
 
 		// so my intent here is to call the object, pass it a bunch of info, and then let it calculate it out
 		tempOrg.updateYourColors(temp_prev_hue, temp_next_hue);
+		tempOrg.updateYourSatBright();
 	  }
 // 		print(array_of_orgs[4]);
 //  		debugger;
@@ -141,21 +142,3 @@ function fancyCalc(hue_one, hue_two){
     
 }
 
-
-function calcthatcolordrift(truecolor, precolor, nextcolor){
-	let varcolor = 0;
-	varcolor = int((truecolor+precolor+nextcolor)/3)	
-	return varcolor;
-// 	print(truecolor, precolor, nextcolor, varcolor);
-
-
-// method two: the derek smoothbrain
-// this one will just calculate the change
-// 	let varcolor = 0;
-// 	let firstdelta = 0;
-// 	let seconddelta = 0;
-// 	firstdelta = 180%(truecolor - precolor);
-// 	secondelta = 180%(truecolor - nextcolor);
-// 	varcolor = firstdelta + seconddelta;
-
-}

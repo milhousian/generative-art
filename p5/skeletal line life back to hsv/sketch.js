@@ -1,22 +1,22 @@
 
 // hey let's declare some globals because why nottttttt
 var array_of_orgs = [];
-var array_of_blues = [];
+// var array_of_blues = [];
 var array_of_hues = [];
-var array_of_greens = [];
+// var array_of_greens = [];
+var array_of_true_hues = [];
 
 // jeez, okay, so technically the globals get declahue first?
-var number_rows = 5;
+var number_rows = 40;
 var row_height = 0; // we're just going to calculate this in a second in setup()
 
 
 function setup() {
 	createCanvas(800,200);
-	background(255,255,255)
-
-	frameRate(2);
+	frameRate(20);
 	// HSB color mode defaults to 360, 100, 100
 	colorMode(HSB);
+	background(255,0,0);
 		
 	// note that colorMode is by default RGB, 0-255
 	// 	colorMode(RGB);
@@ -34,33 +34,32 @@ function draw() {
 	// wow, this works
 	for(var x = 0; x < array_of_orgs.length; x++){
 		array_of_hues[x] = array_of_orgs[x].now_hue;
-
-		// let's just... check that everything is kosher here
-		// !!! everything is not kosher
-		// Average for hues is consistently ~120, when you'd expect it'd be higher
-// 		var total = 0;
-// 		for(var n = 0; n < array_of_hues.length; n++){
-// 			total += array_of_hues[n];
-// 		}
-// 		var avg = total / array_of_hues.length;
-// 		print("current hue average is ", avg);
-		
-		// check on the green average
-		// maybe I should consolidate these into some kind of... thing...
-// 		var total = 0;
-// 		for(var n = 0; n < array_of_greens.length; n++){
-// 			total += array_of_greens[n];
-// 		}
-// 		var avg = total / array_of_greens.length;
-// 		print("current green average is ", avg);
-		
+		array_of_true_hues[x] = array_of_orgs[x].true_hue;	
 	}
-// 			print(array_of_hues);
-// 		print(array_of_orgs);
-// 		debugger;
 
-	// then, for each organism
+
+	// DEBUGGING SECTION
+	// uncomment this to get a running average of the hue values
+	var cur_total = 0;
+	for(var n = 0; n < array_of_hues.length; n++){
+		cur_total += array_of_hues[n];
+	}
+	var cur_avg = cur_total / array_of_hues.length;
 	
+	var true_total = 0;
+	for(var n = 0; n < array_of_true_hues.length; n++){
+		true_total += array_of_true_hues[n];
+	}
+	var true_avg = true_total / array_of_true_hues.length;
+	
+	print("current hue average is ", cur_avg, " true hue avg is ", true_avg);	
+
+	// more random debugging stuff
+	// 			print(array_of_hues);
+	// 		print(array_of_orgs);
+	// 		debugger;
+
+	// then, for each organism, let's do some stuff
 	
 	for (var i = 0; i < array_of_orgs.length; i++){
 		let tempOrg = array_of_orgs[i];
@@ -95,7 +94,7 @@ function draw() {
 		tempOrg.updateYourColors(temp_prev_hue, temp_next_hue);
 	  }
 // 		print(array_of_orgs[4]);
-// 		debugger;
+//  		debugger;
 }
 
 
@@ -108,12 +107,18 @@ function createOrgs(){
 
 
 function fancyCalc(hue_one, hue_two){
+// SO!
+// what we know is because hue #360 = hue #0, it's like a circle
+// you can't ever be more than 180 away from another point
+// so we're going to do some awful awful math
+
 	var delta = 0;
 	var abs_delta = 0;
 	var	calcd_true_distance = 0;
 
 	delta = hue_one - hue_two;
 	abs_delta = abs(delta);
+
 
 	if (abs_delta >=180){
 // 		print("abs delta was greater than 180")
@@ -129,7 +134,7 @@ function fancyCalc(hue_one, hue_two){
 // 		print("abs delta was less than 180");
 		calcd_true_distance = delta;
 	}
-	print("did a calc after being passed ", hue_one, hue_two, " and retd ", calcd_true_distance);
+// 	print("did a calc after being passed ", hue_one, hue_two, " and retd ", calcd_true_distance);
 	return calcd_true_distance;
 // 	print("cur of ", this.now_hue, "prev of ", prev_hue, " move of ", calc1);
 	

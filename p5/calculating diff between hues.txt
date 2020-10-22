@@ -1,0 +1,18 @@
+Okay, so
+
+
+If it's 0-360...
+The maximum distance for color to color is 360, and you know that if it's 360, it is actually 0. So the actual farthest away you could be from any other point is 180 -- at 181, you can go around the other side and be at 179.
+
+So!
+Calculate the distance between the two values.
+
+If it's greater than 180, it's actually 180 - the remainder.
+
+And that'll be true for both the calculations. Now what do you do with the two numbers? I think you just average them.
+
+z = new position - current position
+x = absolute value of (new position - current position)
+if absolute value of x > 180,
+new value is 180 - x
+if absolute value of x <= 180, new value is current position + z

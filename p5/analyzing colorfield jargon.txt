@@ -1,0 +1,73 @@
+A Deconstruction of Colorfield
+--
+
+
+What do we know that it does?
+
+
+* It consists of a series of colored lines
+* on initialization, widths seem to vary
+* smallest band seems to be incredibly small, like 1px
+* lines don't actually seem to grow, but lines near them will change to be like them
+
+
+What is claimed
+
+
+
+Tehcnosphere by Prophet and Selly
+E-volver by Erwin Driessens and Maria Verstappen
+> uses a population of virtual creatures to con- struct a continuously changing image [12]. Each pixel-sized creatures modifies its local environment, hence creating a dynamic interaction between populations of agents and their environment. The system uses interactive evolution to se- lect and breed creatures that create the images. The pixels of the image and the agents that interact with them form the ecosystem, which is the artwork itself.
+
+? what is extended phenotype
+
+
+* each space is a cell
+* at least one organism on the grid
+* ndividu- als occupy one or more cells and are represented visually as lines of colour and sonically as a sine tone: 
+** there's a sound component?
+
+frequency maps logarithmically to hue; phase to saturation; and amplitude to area. A large, red colour produces a loud, deep tone; a small blue colour produces a quiet, high tone. A popula- tion of individuals thus produces a field of colour and sound simultaneously.
+THERE IS SOUND?
+
+An individual’s genome is a fixed-length array of real num- bers representing: the natural colour (hue, saturation, light- ness: HSL); propensity to change to the natural colour, and to the colour of the individual to the left and right of this individual (a normalised weight); propensity to grow into empty neighbouring cells. Each individual in the popula- tion maintains a separate state, which consists of: the age of the agent, health, current resources held, number of cells currently occupied and current colour.
+
+
+? what is a normalized weight?
+
+All individuals begin with no colour (black) and attempt to acquire resources to reach their target colour (a weighted sum, as determined by the genome, of the natural colour and
+Resources are required to change and maintain a particular colour, proportionate to the rate of change. 
+If a neighbouring cell is empty, the individual may “grow” into that cell, the propensity to grow determined by the genome. 
+
+The more cells occupied, the more resources are required to change colour, but the greater the contribution to the overall colour histogram of the world (detailed shortly).
+
+Individuals receive resources from the environment via a
+feedback process based on the composition of the world. At each timestep, t, a histogram of chroma and intensity values for the world is built. This histogram, Ht is used as a basis for delivering resources to the world.
+
+Resources are distributed equally to all the cells in that world
+More cells = more resources
+
+
+
+How is the histogram constructed?
+How is the histogram used as a basis to distribute resources?
+How is does the function evaluate the histogram to distribute resources?
+
+
+
+"A number of different versions of the function f have been tested. These include: favouring chroma values with peaks at equal division, maximising chroma or intensity variation; matching a normal distribution; matching histograms based on paintings recognised for their skilful use of colour."
+
+Given sufficient resources, and following some period of “growth”, an individual may reach its desired colour and width (which may be dependent on the individual’s neigh- bour states).
+--- wait wait wait, does this mean it can be hampered by neighboring colors? can it achieve...
+
+? how do cells grow?
+
+Can reproduce
+
+At this time, it may choose to reproduce, either by crossover with an immediate neighbour, or—if there are no neighbours—by mutation. In the case of two immediate neighbours, the mating partner is selected with probability weighted to the normalised Euclidean distance between the colour of the individual and its neighbours, so individuals are more likely to mate with others who produce colours similar to themselves. Offspring are placed in the nearest empty cell, or if none exists, they replace parent cells.
+
+
+? If there are insufficient resources, the agent is unable to main- tain its target colour, causing it to fade and eventually die.
+? what is the cost to maintaining a target color?
+
+Over time, the system evolves to maximise the produc- tion of resources according to the composition of the his- togram, which is determined by the size and colour of all the individuals in the world. The system exhibits novel colour patterns with patterns of stasis followed by large- scale change as new optimal configurations are discovered. Due to the configuration of co-dependencies, Colourfield ex- hibits classic ecosystem phenomena such as parasitism (a rogue colour contributing little to resource production but “feeding off” other resource producing colours) and mutu- alism (co-operative combinations of colours mutually con- tributing to high resource production).

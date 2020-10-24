@@ -9,6 +9,7 @@ function Critter(){
 	this.size = 1;
 	this.age = 0;
 	this.ready_to_expand = 0;
+	this.width_percentage = random();
 
 
 	this.timePasses = function(){

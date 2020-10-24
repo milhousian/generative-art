@@ -205,10 +205,6 @@ function drawRows(){
 }
 
 
-function testFunction(){
-	print("test called");	
-}
-
 
 function createCritters(){  
     for(var i = 0; i < number_rows; i +=1){
@@ -223,8 +219,3 @@ function createRows(){
 		}
 }
 
-
-
-// ? how do we get this to then call the stuff
-//	critterArray.forEach(testFunction);
-	

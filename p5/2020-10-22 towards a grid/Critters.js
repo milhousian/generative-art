@@ -40,7 +40,7 @@ function Critter(){
 		if ((desired_change * food_cost_to_move) < this.food){   // only change if it has enough energy to get there
 			this.food = this.food - (desired_change  * food_cost_to_move);
 			this.displayed_color = temp_color_holder;
-			print("someone moved!");
+// 			print("someone moved!");
 		} 
 	}	
 		

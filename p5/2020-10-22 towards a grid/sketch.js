@@ -11,8 +11,9 @@ var rowOccupants = []; // array with number of rows, with the position of occupy
 var critterArray = [];
 var emptyCellLocations = [];
 var liveCritterLocations = [];
-var global_food_to_allocate = 12;
+var global_food_to_allocate = 999;
 var food_cost_basic = 1; // blergh
+var food_cost_to_move = 1; // how much "food" does it cost to move one RGB unit
 var edge_detection_visibility = 1; // flip to 1 for Cynthia-friendly mode
 var edge_border_color = 180; // grey scale 0 for black, 255 for white...
 
@@ -29,31 +30,46 @@ function setup() {
 
 
 function draw() {
+	background(255);
 	drawRows();
-	determineFoodAvailable();
+	determineFoodAvailable(); // unimplemented
 	ageCritters();
 	allocateFood();
-	dinnerTime();
-	catalogLiveCritters();
+	dinnerTime(); // unimplemented
 	catalogEmptyCells();
 	fillEmptyCellsWithNew(); // just writing one method
-	debugger;
-		
+	catalogLiveCritters(); // the order in which cells die and are catalogued matters a lot
+	everybodyChangeColors(); // dependent on that catalog
+//	print("tick");
+// 	debugger;   // uncomment to debug per-frame	
 }
 
-
-function catalogLiveCritters(){
-	// we need a list of the live critter locations so we can reference neighbors
-	// I think. I might be high.
-	liveCritterLocations = []; // empty it out before each run through
-	for(var i = 0; i < critterArray.length; i++){
-		if(critterArray[i].am_alive == 1) {    //if it's alive, push where we found it
-			liveCritterLocations.push(i);
-		}
-	// liveCritterLocations should now contain an array of locations in CritterArray where that critter is alive
+// this one's always dicey
+function everybodyChangeColors(){
+	print("change colors called");
+	let temp_next_location;
+	let temp_prev_location;
+	let temp_current_critter_location_in_critter_array = 0;
+	// liveCritterLocations = a list of where, in the row occupants, they are alive, in order
+		
+	// for every value in the live critter locations, grab what's in the previous and next positions
+	for(var i = 0; i < liveCritterLocations.length; i++){
+			if(i==0) {  // if there won't be a previous occupant, improvise
+				temp_next_location = liveCritterLocations[i+1]; // pass the position in critter from rowOccupants
+				temp_prev_location = liveCritterLocations[rowOccupants.length-1]; // 
+			} else if (i== (liveCritterLocations.length-1)) { // if there won't be a next one
+				temp_next_location = liveCritterLocations[0]; // grab the first one
+				temp_prev_location = liveCritterLocations[rowOccupants.length-1]; // 
+			} else {   // normal case, we're in the middle
+				temp_next_location = liveCritterLocations[i+1]; // pass the position in critter from rowOccupants
+				temp_prev_location = liveCritterLocations[i-1];
+			}
+			temp_current_critter_location_in_critter_array = liveCritterLocations[i];
+			// call that position in the critter array to update its colors
+			// passing in the location of the previous and next
+			critterArray[temp_current_critter_location_in_critter_array].updateColors(temp_prev_location, temp_next_location);
 	}
 }
-
 
 function dinnerTime(){
 // everybody, eat
@@ -75,7 +91,6 @@ function dinnerTime(){
 
 function determineFoodAvailable(){
 	// this is where we could look at what the colors and whatever are and make a calculation
-
 }
 
 
@@ -87,7 +102,6 @@ function allocateFood(){
 	for(var i = 0; i < number_rows; i +=1){
 		critterArray[rowOccupants[i]].food = critterArray[rowOccupants[i]].food + food_per_row;
 	}
-
 }
 
 
@@ -97,9 +111,7 @@ function allocateFood(){
 function fillEmptyCellsWithNew(){
 	for(var i = 0; i < emptyCellLocations.length; i++){
 		tempCritter = new Critter(); // generate a new Critter
-		print("length of critterarray is ", critterArray.length);
 		critterArray.push(tempCritter); // add it to the critter array
-		print("length of critterarray is ", critterArray.length);
 		rowOccupants[emptyCellLocations[i]] = critterArray.length-1; // go to the rowOccupant where we know there's a vacancy, put the id of the new one in
 		}
 }
@@ -120,13 +132,20 @@ function fillEmptyCellsWithNew(){
 // 				debugger;
 // 			}
 // 		}
-// 		
-// 		
-// 		
-// 	
 // 	}
 	
 
+
+function catalogLiveCritters(){
+	// we need a list of the live critter locations so we can reference neighbors
+	liveCritterLocations = []; // empty it out before each run through
+	for(var i = 0; i < critterArray.length; i++){
+		if(critterArray[i].am_alive == 1) {    //if it's alive, push where we found it
+			liveCritterLocations.push(i);
+		}
+	// liveCritterLocations should now contain an array of locations in CritterArray where that critter is alive
+	}
+}
 
 // go through and see where there are vacancies
 function catalogEmptyCells(){
@@ -155,8 +174,8 @@ function ageCritters(){
 }
 
 // we're going to iterate through each row and fill it with the color of the critter occupying that row
+// using push/pop/translate so that the relative drawing position moves
 function drawRows(){
-	print("starting to draw rows");
 	for(var i = 0; i < number_rows; i +=1){
 		rectMode(CENTER);
 		let centerx = (width/2);
@@ -167,12 +186,12 @@ function drawRows(){
 		translate(0, (i*row_height));
 		if(edge_detection_visibility == 1){    // check if we want edges
 			strokeWeight(10);
-			stroke(0,0,50);
+			stroke(edge_border_color);
 		} else {
 			noStroke();
 		}
 		// go grab the color of the critter that lives in this spot in the rowOccupants
-		print("went to see who lives at ", i, "and found ", rowOccupants[i], " which is ", critterArray[rowOccupants[i]]);
+// 		print("went to see who lives at ", i, "and found ", rowOccupants[i], " which is ", critterArray[rowOccupants[i]]);
 		fill(critterArray[rowOccupants[i]].displayed_color);
 
 		if(edge_detection_visibility == 1){    // check if we're varying width
@@ -183,8 +202,6 @@ function drawRows(){
 		}
 		pop();
 		}
-	// we could feed here	
-
 }
 
 

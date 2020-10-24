@@ -13,8 +13,8 @@ function Critter(){
 
 	this.timePasses = function(){
 		this.age++;
-		let death = 10;
-		if (death<this.age){
+		let death = random(0,20);
+		if (death<1){
 			this.die();
 		}
 	}
@@ -25,5 +25,14 @@ function Critter(){
 		this.size = 0;	
 	}
 		
+	this.checkForExpansionReady = function(){
+		// conservative initially, has to able to survive next frame at new size w/o food
+		if((this.size*food_cost_basic )< this.food ){
+			this.ready_to_expand = 1;
+			print("someone is ready to go");
+		}
+	
+	}
+	
 	
 }

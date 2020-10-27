@@ -5,15 +5,15 @@
 var height = 800;
 var width = 800;
 var target_framerate = 10;
-var number_rows = 5;
+var number_rows = 200;
 var row_height = 0; // we'll calculate this in a second in setup()
 var rowOccupants = []; // array with number of rows, with the position of occupying critter
 var critterArray = [];
 var emptyCellLocations = [];
 var liveRowOccupants = [];
 var uniqLiveRowOccupants = [];
-var global_food_to_allocate = 4 * number_rows; // how much do you want each row to get to munch
-var food_cost_basic = 1; // blergh
+var global_food_to_allocate = 2 * number_rows; // how much do you want each row to get to munch
+var food_cost_basic = 2; // blergh
 var food_cost_to_move = 1; // how much "food" does it cost to move one RGB unit
 var edge_detection_visibility = 0; // flip to 1 for Cynthia-friendly mode
 var edge_border_color = 180; // grey scale 0 for black, 255 for white...
@@ -21,9 +21,9 @@ var edge_border_color = 180; // grey scale 0 for black, 255 for white...
 function setup() {
 	createCanvas(800,800);
 	frameRate(30);
-	colorMode(RGB);
-	// colorMode(HSB); // HSB color mode defaults to 360, 100, 100
-	background(255,255,255);
+	// colorMode(RGB);
+	colorMode(HSB); // HSB color mode defaults to 360, 100, 100
+	background(255,100,100);
 	row_height = (height/number_rows);
 	createCritters();
 	createRows();
@@ -41,7 +41,7 @@ function draw() {
 	fillEmptyCellsWithExpansionThenNew();
 	catalogLiveRowOccupants(); // the order in which cells die and are catalogued matters a lot
 	everybodyChangeColors(); // dependent on that catalog
-	// print("frame complete");
+	print("frame complete");
 	// debugger;   // uncomment to debug per-frame
 }
 
@@ -83,8 +83,10 @@ function dinnerTime(){
 	// TODO: I might need an array of live critters locations in the critter array aaaaand...
 	// TODO: or a multi-dimensional array
 	for(var i = 0; i < critterArray.length; i++){
-		critterArray[i].eatDinner();
+		if (critterArray[i].am_alive=1){
+			critterArray[i].eatDinner();
 		}
+	}
 }
 
 function determineFoodAvailable(){
@@ -97,7 +99,7 @@ function allocateFood(){
 	// first, take the global allowance and divide it
 	let food_per_row = global_food_to_allocate/number_rows;
 	// a couple ways we could do this -- I'm going to go with this very simple goldfish tank style one
-	for(var i = 0; i < number_rows; i +=1){
+	for(var i = 0; i < number_rows; i++){
 		critterArray[rowOccupants[i]].food = critterArray[rowOccupants[i]].food + food_per_row;
 	}
 }
@@ -208,9 +210,9 @@ function catalogLiveRowOccupants(){
 		if(critterArray[rowOccupants[i]].am_alive == 1) {    //if it's alive, push where we found it
 			liveRowOccupants.push(i);
 		}
-	uniqLiveRowOccupants = [...new Set(liveRowOccupants)];
-	print("live row occupants = ", liveRowOccupants);
-	print("unique row occupants = ", uniqLiveRowOccupants);
+	// uniqLiveRowOccupants = [...new Set(liveRowOccupants)];
+	// print("live row occupants = ", liveRowOccupants);
+	// print("unique row occupants = ", uniqLiveRowOccupants);
 	}
 
 }
@@ -265,8 +267,7 @@ function drawRows(){
 		// go grab the color of the critter that lives in this spot in the rowOccupants
 		// print("went to see who lives at ", i, "and found ", rowOccupants[i], " which is ", critterArray[rowOccupants[i]]);
 
-		// temporary TODO: this drops red so they render in a blue-green spectrum
-		fill(0, critterArray[rowOccupants[i]].displayed_color, critterArray[rowOccupants[i]].displayed_color );
+		fill(critterArray[rowOccupants[i]].displayed_color, 75, 75);
 
 		// take only one color if you want to just run on grayscale
 		// 	fill(critterArray[rowOccupants[i]].displayed_color);

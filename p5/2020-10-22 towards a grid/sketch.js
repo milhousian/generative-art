@@ -4,14 +4,14 @@
 // they get declared first, so we can head into setup
 var height = 800;
 var width = 800;
-var target_framerate = 10;
-var number_rows = 200;
+var target_framerate = 20;
+var number_rows = 10;
 var row_height = 0; // we'll calculate this in a second in setup()
 var rowOccupants = []; // array with number of rows, with the position of occupying critter
 var critterArray = [];
 var emptyCellLocations = [];
 var liveRowOccupants = [];
-var uniqLiveRowOccupants = [];
+var uniqLiveRowOccupants = []; // probably can depricate this
 var global_food_to_allocate = 2 * number_rows; // how much do you want each row to get to munch
 var food_cost_basic = 2; // blergh
 var food_cost_to_move = 1; // how much "food" does it cost to move one RGB unit
@@ -42,11 +42,19 @@ function draw() {
 	catalogLiveRowOccupants(); // the order in which cells die and are catalogued matters a lot
 	everybodyChangeColors(); // dependent on that catalog
 	print("frame complete");
+	// print(critterArray);
 	// debugger;   // uncomment to debug per-frame
 }
 
-// this one's always dicey
+
 function everybodyChangeColors(){
+	for(var i = 0; i < liveRowOccupants.length; i++){
+		critterArray[[rowOccupants[i]]].updateNeighborInfo();
+		critterArray[[rowOccupants[i]]].updateColors();
+	}
+}
+
+function everybodyChangeColorsOld(){
 	let next_location;
 	let prev_location;
 	let current_row_position = 0;
@@ -83,7 +91,7 @@ function dinnerTime(){
 	// TODO: I might need an array of live critters locations in the critter array aaaaand...
 	// TODO: or a multi-dimensional array
 	for(var i = 0; i < critterArray.length; i++){
-		if (critterArray[i].am_alive=1){
+		if (critterArray[i].am_alive==1){
 			critterArray[i].eatDinner();
 		}
 	}
@@ -187,12 +195,13 @@ function fillEmptyCellFromNeighbor(cellToFill, neighborCritterID){
 	let tempCellToFill = cellToFill;
 	let parentCritter = neighborCritterID;
 	critterArray[neighborCritterID].size = critterArray[neighborCritterID].size++; // tell the creature it's bigger
+	critterArray[neighborCritterID].rows_occupied.push(tempCellToFill); // hopefully, add this to positions
 	rowOccupants[tempCellToFill] = rowOccupants[neighborCritterID];
 }
 
 function fillEmptyCellWithNew (cellToFill){
 	let tempCellToFill = cellToFill;
-	let tempCritter = new Critter(); // generate a new Critter
+	let tempCritter = new Critter(cellToFill); // generate a new Critter
 	critterArray.push(tempCritter); // add it to the critter array
 	rowOccupants[tempCellToFill] = critterArray.length-1; // go to the rowOccupant where we know there's a vacancy, put the id of the new one in
 }
@@ -204,6 +213,7 @@ function catalogLiveRowOccupants(){
 	// we need a list of the live critter locations so we can reference neighbors
 	// so we go through the rows and check each one to see if its occupant is alive
 	// TODO note this approach will lead to a multi-space critter being listed repeatedly
+	// TODO what are we doing here?
 	liveRowOccupants = []; // empty it out before each run through
 	uniqLiveRowOccupants = [];
 	for(var i = 0; i < number_rows; i++){
@@ -267,7 +277,7 @@ function drawRows(){
 		// go grab the color of the critter that lives in this spot in the rowOccupants
 		// print("went to see who lives at ", i, "and found ", rowOccupants[i], " which is ", critterArray[rowOccupants[i]]);
 
-		fill(critterArray[rowOccupants[i]].displayed_color, 75, 75);
+		fill(critterArray[rowOccupants[i]].displayed_color, critterArray[rowOccupants[i]].natural_saturation, 75);
 
 		// take only one color if you want to just run on grayscale
 		// 	fill(critterArray[rowOccupants[i]].displayed_color);
@@ -283,18 +293,11 @@ function drawRows(){
 }
 
 
-
-
 function createCritters(){
-	// ??? WHYYYYYYYYY
-	// why does this sometimes appear to not be blank?
-	// why when iterating through it and printing it out does it seem like it's not being
-	// added to one-by-one?
 	critterArray = [];
-	// print("creating crittesrs, this should be blank: ", critterArray);
     for(var i = 0; i < number_rows; i +=1){
-		let newCritter = new Critter();
-		critterArray.push(newCritter);
+			let newCritter = new Critter(i);
+			critterArray.push(newCritter);
 		// print("there should now be one more in ", critterArray);
 		}
 	// print("created this array", critterArray);
@@ -308,13 +311,7 @@ function createCritters(){
 // 		}
 // 	print("created this array", critterArray);
 // }
-
-
-
 }
-
-
-
 
 
 function createRows(){

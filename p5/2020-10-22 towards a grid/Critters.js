@@ -1,11 +1,12 @@
 function Critter(position){
 	this.natural_color = round(random(0,359));
 	this.natural_saturation = round(random(0,100));
+	this.luminosity = 0;
 	this.displayed_color = 0;
 	this.am_alive = 1;
 	this.health = 50;
 	this.food = 2;
-	this.towards_natural = 0.3;
+	this.towards_natural = 0.6;
 	this.towards_neighbors = 0.1;
 	this.size = 1;
 	this.age = 0;
@@ -62,7 +63,9 @@ function Critter(position){
 		change_towards_next = round(change_towards_next * this.towards_neighbors);
 		// TODO I'm dividing this down because it could on its own exceed 180
 		desired_change = (change_towards_true + change_towards_next + change_towards_prev);
-		print("color check: me: ", this.displayed_color, " natural is ", this.natural_color, " neighbor colors are ", temp_prev_neighbor_color, temp_next_neighbor_color, " thus calculated deltas as ", change_towards_true, change_towards_prev, change_towards_next, " and a change of ", desired_change);
+
+		// I think this looks pretty good
+		// print("color check: me: ", this.displayed_color, " natural is ", this.natural_color, " neighbor colors are ", temp_prev_neighbor_color, temp_next_neighbor_color, " thus calculated deltas as ", change_towards_true, change_towards_prev, change_towards_next, " and a change of ", desired_change);
 
 		if(desired_change>180){
 			print("hey derek desired change is larger than 180: ", desired_distance);
@@ -78,8 +81,7 @@ function Critter(position){
 		if (desired_distance > 0 && (desired_distance * food_cost_to_move) < this.food){   // only change if it has enough energy to get there
 			this.food = this.food - (desired_distance * food_cost_to_move);
 			this.displayed_color = color_to_change_to;
-			print("moved to ", this.displayed_color);
- 			// print("someone moved! from ", old_color, " to ", this.displayed_color);
+			// print("moved to ", this.displayed_color);s
 		} else if (desired_change > 0){
 			// print("wanted to move ", desired_change, " but food was ", this.food);
 		}
@@ -90,7 +92,7 @@ function Critter(position){
 
 	this.timePasses = function(){
 		this.age++;
-		let death = random(0,1000);
+		let death = random(0,999);
 		if (death < death_rate_as_chance_in_thousand){
 			this.die();
 		}
@@ -104,6 +106,7 @@ function Critter(position){
 	}
 
 	this.eatDinner = function(){
+		// print("eating dinner");
 		let cost = (this.size**2) * food_cost_basic;
 		this.food = this.food - cost;
 		round(this.food);
@@ -113,8 +116,16 @@ function Critter(position){
 		if (this.food < 0){
 			this.die();
 		}
+		if (this.luminosity < 100 ){
+			// print("hey tripped that luminosity thing, ", this.luminosity);
+			this.luminosity++;
+			this.food--;
+		}
+
+
 		if (this.food > 400){
-			this.food = 100; // socialism!!
+			food_available_to_distribute = this.food - cost;
+			this.food = cost; // socialism!!
 		}
 
 // TODO it'd be nice if too much food went to one's neighbors

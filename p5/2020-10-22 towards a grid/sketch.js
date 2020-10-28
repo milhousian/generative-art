@@ -4,19 +4,21 @@
 // they get declared first, so we can head into setup
 var height = 800;
 var width = 800;
-var target_framerate = 20;
-var number_rows = 10;
+var target_framerate = 30;
+var number_rows = 200;
 var row_height = 0; // we'll calculate this in a second in setup()
 var rowOccupants = []; // array with number of rows, with the position of occupying critter
 var critterArray = [];
 var emptyCellLocations = [];
 var liveRowOccupants = [];
 var uniqLiveRowOccupants = []; // probably can depricate this
-var global_food_to_allocate = 2 * number_rows; // how much do you want each row to get to munch
-var food_cost_basic = 2; // blergh
+var global_food_to_allocate = 3 * number_rows; // how much do you want each row to get to munch
+var food_cost_basic = 1; // blergh
 var food_cost_to_move = 1; // how much "food" does it cost to move one RGB unit
 var edge_detection_visibility = 0; // flip to 1 for Cynthia-friendly mode
 var edge_border_color = 180; // grey scale 0 for black, 255 for white...
+var death_rate_as_chance_in_thousand = 2;
+
 
 function setup() {
 	createCanvas(800,800);
@@ -31,9 +33,9 @@ function setup() {
 
 
 function draw() {
-	background(255);
+	background(180,0,0);
 	drawRows();
-	determineFoodAvailable(); // unimplemented
+	// determineFoodAvailable(); // unimplemented
 	ageCritters(); // can kill off cells
 	allocateFood();
 	dinnerTime(); // can kill off cells
@@ -46,6 +48,38 @@ function draw() {
 	// debugger;   // uncomment to debug per-frame
 }
 
+function fancyCalc(hue_one, hue_two){
+// SO!
+// what we know is because hue #360 = hue #0, it's like a circle
+// you can't ever be more than 180 away from another point
+// so we're going to do some awful awful math
+
+	var delta = 0;
+	var abs_delta = 0;
+	var	calcd_true_distance = 0;
+
+	delta = hue_one - hue_two;
+	abs_delta = abs(delta);
+
+	if (abs_delta >=180){
+// 		print("abs delta was greater than 180")
+		// if it's a negative difference
+		if (delta < 0){
+			calcd_true_distance = 180 - (abs_delta%180);
+// 			print ("twas negative ", abs_delta%180);
+		} else {
+			calcd_true_distance = (180 - (abs_delta%180));
+// 			print ("twas positive ");
+		}
+	} else {
+// 		print("abs delta was less than 180");
+		calcd_true_distance = delta;
+	}
+// 	print("did a calc after being passed ", hue_one, hue_two, " and retd ", calcd_true_distance);
+	return calcd_true_distance;
+// 	print("cur of ", this.now_hue, "prev of ", prev_hue, " move of ", calc1);
+}
+
 
 function everybodyChangeColors(){
 	for(var i = 0; i < liveRowOccupants.length; i++){
@@ -54,48 +88,15 @@ function everybodyChangeColors(){
 	}
 }
 
-function everybodyChangeColorsOld(){
-	let next_location;
-	let prev_location;
-	let current_row_position = 0;
-	let current_critter_location_in_critter_array = 0;
-	// liveRowOccupants = a list of rows where there is a live critter
-
-	// for every value in the live critter locations, grab what's in the previous and next positions
-	// TODO this is incomplete
-
-	for(var i = 0; i < liveRowOccupants.length; i++){
-		current_row_position = liveRowOccupants[i];
-		if(current_row_position == 0) {  // if there won't be a previous occupant, improvise
-			next_location = current_row_position + 1;
-			prev_location = number_rows -1;
-		} else if (i== (liveRowOccupants.length-1)) { // if there won't be a next one....
-			next_location = 0;
-			prev_location = current_row_position - 1;
-		} else {
-			next_location = current_row_position + 1;
-			prev_location = current_row_position - 1;
-		}
-
-		current_critter_location_in_critter_array = rowOccupants[liveRowOccupants[i]];
-		// call that position in the critter array to update its colors
-		// passing in the location of the previous and next
-// 		print("I was looking at ", i, " in livecritter locations, which is ", liveRowOccupants[i], " which is org ", rowOccupants[liveRowOccupants[i]], " which is ", critterArray[rowOccupants[liveRowOccupants[i]]])
-		critterArray[current_critter_location_in_critter_array].updateColors(prev_location, next_location);
-	}
-}
 
 function dinnerTime(){
-	// everybody, eat...
-	// TODO: this currently will call a multi-cell critter at each of its locations
-	// TODO: I might need an array of live critters locations in the critter array aaaaand...
-	// TODO: or a multi-dimensional array
-	for(var i = 0; i < critterArray.length; i++){
-		if (critterArray[i].am_alive==1){
-			critterArray[i].eatDinner();
+	for(var i = 0; i < uniqLiveRowOccupants.length; i++){
+		if (critterArray[uniqLiveRowOccupants[i]].am_alive==1){
+			critterArray[uniqLiveRowOccupants[i]].eatDinner();
 		}
 	}
 }
+
 
 function determineFoodAvailable(){
 	// this is where we could look at what the colors and whatever are and make a calculation
@@ -113,46 +114,6 @@ function allocateFood(){
 }
 
 
-// figure out what to do with those empty cells
-// TODO, something weird is happening here
-
-function fillEmptyCellsWithNewOnly(){
-	for(var i = 0; i < emptyCellLocations.length; i++){
-		print("trying to fill some cells with new");
-		fillEmptyCellWithNew(emptyCellLocations[i]);
-		}
-}
-
-function fillEmptyCellsWithExpansionOnly(){
-// we have an array of empty cell locations. for each of these, is the previous or next cell ready?
-for(var i = 0; i < emptyCellLocations.length; i++){
-		let current_vacancy_row = emptyCellLocations[i];
-		let prev_row = -1;
-		let next_row = -1;
-		// define where to look for the next/previous neighbors
-		// making sure we're not first or last, which would cause an out of bounds error
-		if (current_vacancy_row != 0 && current_vacancy_row != (number_rows-1)){
-			// check the previous to see if it's ready_to_expand
-			prev_row = current_vacancy_row -1;
-			next_row = current_vacancy_row +1;
-		} else if (current_vacancy_row == 0) {
-			prev_row = number_rows-1;
-			next_row = current_vacancy_row +1;
-		} else if (current_vacancy_row == (number_rows-1)) {
-			prev_row = current_vacancy_row -1;
-			next_row = 0;
-		}
-
-		// those defined we can now move to attempting a fill from them
-		if (critterArray[rowOccupants[prev_row]].am_alive == 1 && critterArray[rowOccupants[prev_row]].ready_to_expand == 1){
-			fillEmptyCellFromNeighbor(emptyCellLocations[i], critterArray[rowOccupants[prev_row]]);
-			print("filled ", emptyCellLocations[i], " from previous ");
-		} else if (critterArray[rowOccupants[next_row]].am_alive == 1 && critterArray[rowOccupants[next_row]].ready_to_expand == 1){
-			fillEmptyCellFromNeighbor(emptyCellLocations[i], critterArray[rowOccupants[next_row]]);
-			print("filled ", emptyCellLocations[i], " from next ");
-		}
-}
-}
 
 
 function fillEmptyCellsWithExpansionThenNew(){
@@ -253,11 +214,12 @@ function ageCritters(){
 	}
 }
 
+
 /* we're going to iterate through each row and fill it with the color
 	of the critter occupying that row  using push/pop/translate so
 	the relative drawing position moves */
 
-
+// ah, drawRows. Good old trusty drawRows. Remember when this was the troublesome function? those were the days.
 function drawRows(){
 	for(var i = 0; i < number_rows; i +=1){
 		rectMode(CENTER);
@@ -275,7 +237,7 @@ function drawRows(){
 		}
 
 		// go grab the color of the critter that lives in this spot in the rowOccupants
-		// print("went to see who lives at ", i, "and found ", rowOccupants[i], " which is ", critterArray[rowOccupants[i]]);
+		print("went to see who lives at ", i, "and found ", rowOccupants[i], " which is ", critterArray[rowOccupants[i]]);
 
 		fill(critterArray[rowOccupants[i]].displayed_color, critterArray[rowOccupants[i]].natural_saturation, 75);
 
@@ -298,24 +260,86 @@ function createCritters(){
     for(var i = 0; i < number_rows; i +=1){
 			let newCritter = new Critter(i);
 			critterArray.push(newCritter);
-		// print("there should now be one more in ", critterArray);
 		}
-	// print("created this array", critterArray);
-
-// WHY DOES DOING IT THIS WAY SOMETIMES CREATE A BLANK ENTRY WTFFFFFFFF
-// TODO: ask
-// 	print("creating crittesrs, this should be blank: ", critterArray);
-//     for(var i = 0; i < number_rows; i +=1){
-// 		critterArray[i] = new Critter(); // we'll need one critter per row to start
-// 		print("there should now be one more in ", critterArray);
-// 		}
-// 	print("created this array", critterArray);
-// }
 }
 
 
 function createRows(){
 	for(var i = 0; i < number_rows; i +=1){
 		rowOccupants[i] = i; // each row starts out with the number of the critter occupying it
+		}
+}
+
+
+// function fillEmptyCellsWithExpansionOnly(){
+// // we have an array of empty cell locations. for each of these, is the previous or next cell ready?
+// 	for(var i = 0; i < emptyCellLocations.length; i++){
+// 		let current_vacancy_row = emptyCellLocations[i];
+// 		let prev_row = -1;
+// 		let next_row = -1;
+// 		// define where to look for the next/previous neighbors
+// 		// making sure we're not first or last, which would cause an out of bounds error
+// 		if (current_vacancy_row != 0 && current_vacancy_row != (number_rows-1)){
+// 			// check the previous to see if it's ready_to_expand
+// 			prev_row = current_vacancy_row -1;
+// 			next_row = current_vacancy_row +1;
+// 		} else if (current_vacancy_row == 0) {
+// 			prev_row = number_rows-1;
+// 			next_row = current_vacancy_row +1;
+// 		} else if (current_vacancy_row == (number_rows-1)) {
+// 			prev_row = current_vacancy_row -1;
+// 			next_row = 0;
+// 		}
+//
+// 		// those defined we can now move to attempting a fill for each
+// 		if (critterArray[rowOccupants[prev_row]].am_alive == 1 && critterArray[rowOccupants[prev_row]].ready_to_expand == 1){
+// 			fillEmptyCellFromNeighbor(emptyCellLocations[i], critterArray[rowOccupants[prev_row]]);
+// 			print("filled ", emptyCellLocations[i], " from previous ");
+// 		} else if (critterArray[rowOccupants[next_row]].am_alive == 1 && critterArray[rowOccupants[next_row]].ready_to_expand == 1){
+// 			fillEmptyCellFromNeighbor(emptyCellLocations[i], critterArray[rowOccupants[next_row]]);
+// 			print("filled ", emptyCellLocations[i], " from next ");
+// 		}
+// 	}
+// }
+//
+//
+// function everybodyChangeColorsOld(){
+// 	let next_location;
+// 	let prev_location;
+// 	let current_row_position = 0;
+// 	let current_critter_location_in_critter_array = 0;
+// 	// liveRowOccupants = a list of rows where there is a live critter
+//
+// 	// for every value in the live critter locations, grab what's in the previous and next positions
+// 	// TODO this is incomplete
+//
+// 	for(var i = 0; i < liveRowOccupants.length; i++){
+// 		current_row_position = liveRowOccupants[i];
+// 		if(current_row_position == 0) {  // if there won't be a previous occupant, improvise
+// 			next_location = current_row_position + 1;
+// 			prev_location = number_rows -1;
+// 		} else if (i== (liveRowOccupants.length-1)) { // if there won't be a next one....
+// 			next_location = 0;
+// 			prev_location = current_row_position - 1;
+// 		} else {
+// 			next_location = current_row_position + 1;
+// 			prev_location = current_row_position - 1;
+// 		}
+//
+// 		current_critter_location_in_critter_array = rowOccupants[liveRowOccupants[i]];
+// 		// call that position in the critter array to update its colors
+// 		// passing in the location of the previous and next
+// // 		print("I was looking at ", i, " in livecritter locations, which is ", liveRowOccupants[i], " which is org ", rowOccupants[liveRowOccupants[i]], " which is ", critterArray[rowOccupants[liveRowOccupants[i]]])
+// 		critterArray[current_critter_location_in_critter_array].updateColors(prev_location, next_location);
+// 	}
+// }
+
+
+
+
+function fillEmptyCellsWithNewOnly(){
+	for(var i = 0; i < emptyCellLocations.length; i++){
+		print("trying to fill some cells with new");
+		fillEmptyCellWithNew(emptyCellLocations[i]);
 		}
 }

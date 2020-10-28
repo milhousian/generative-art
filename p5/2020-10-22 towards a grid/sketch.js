@@ -2,10 +2,10 @@
 
 // let's declare some globals!
 // they get declared first, so we can head into setup
-var height = 800;
-var width = 800;
-var target_framerate = 30;
-var number_rows = 200;
+var height = 400;
+var width = 400;
+var target_framerate = 10;
+var number_rows = 100;
 var row_height = 0; // we'll calculate this in a second in setup()
 var rowOccupants = []; // array with number of rows, with the position of occupying critter
 var critterArray = [];
@@ -14,7 +14,7 @@ var liveRowOccupants = [];
 var uniqLiveRowOccupants = []; // probably can depricate this
 var global_food_to_allocate = 3 * number_rows; // how much do you want each row to get to munch
 var food_cost_basic = 1; // blergh
-var food_cost_to_move = 1; // how much "food" does it cost to move one RGB unit
+var food_cost_to_move = 0; // how much "food" does it cost to move one RGB unit
 var edge_detection_visibility = 0; // flip to 1 for Cynthia-friendly mode
 var edge_border_color = 180; // grey scale 0 for black, 255 for white...
 var death_rate_as_chance_in_thousand = 2;
@@ -237,7 +237,7 @@ function drawRows(){
 		}
 
 		// go grab the color of the critter that lives in this spot in the rowOccupants
-		print("went to see who lives at ", i, "and found ", rowOccupants[i], " which is ", critterArray[rowOccupants[i]]);
+		// print("went to see who lives at ", i, "and found ", rowOccupants[i], " which is ", critterArray[rowOccupants[i]]);
 
 		fill(critterArray[rowOccupants[i]].displayed_color, critterArray[rowOccupants[i]].natural_saturation, 75);
 

@@ -57,7 +57,7 @@ function drawRows() {
     let rect_height = row_height;
     push();
     translate(0, i * row_height);
-    if (edge_detection_visibility == 1) {
+    if (edge_detection_visibility === 1) {
       // check if we want edges
       strokeWeight(10);
       stroke(edge_border_color);
@@ -77,7 +77,7 @@ function drawRows() {
     // take only one color if you want to just run on grayscale
     // 	fill(critterArray[rowOccupants[i]].displayed_color);
 
-    if (edge_detection_visibility == 1) {
+    if (edge_detection_visibility === 1) {
       // check if we're varying width
       let tempWidthPercent = critterArray[rowOccupants[i]].width_percentage;
       rect(centerx, centery, rect_width * tempWidthPercent, rect_height);
@@ -115,7 +115,7 @@ function allocateFood() {
 
 function dinnerTime() {
   uniqueRowOccupants.forEach((occupant) => {
-    if (critterArray[occupant].am_alive == 1) {
+    if (critterArray[occupant].am_alive === 1) {
       critterArray[occupant].eatDinner();
       // print("called out to eat dinner");
     }
@@ -126,13 +126,13 @@ function dinnerTime() {
 function catalogEmptyCells() {
   let emptyCells = [];
   for (var i = 0; i < number_rows; i++) {
-    if (critterArray[rowOccupants[i]].am_alive == 0) {
+    if (critterArray[rowOccupants[i]].am_alive === 0) {
       // append that location to the array of empty cell locations
       emptyCells.push(i);
     }
   }
   // if they're all dead, let's just throw it into debugger
-  if (emptyCells.length == number_rows) {
+  if (emptyCells.length === number_rows) {
     debugger;
   }
   return emptyCells;

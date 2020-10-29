@@ -109,8 +109,8 @@ function allocateFood() {
   // a couple ways we could do this -- I'm going to go with this very simple goldfish tank style one
   for (var i = 0; i < number_rows; i++) {
     critterArray[rowOccupants[i]].food += food_per_row;
-    food_available_to_distribute = 0; // set this to zero
   }
+  food_available_to_distribute = 0; // set this to zero
 }
 
 function dinnerTime() {
@@ -202,7 +202,7 @@ function fillEmptyCellWithNew(cellToFill) {
   let tempCritter = new Critter(cellToFill); // generate a new Critter
   critterArray.push(tempCritter); // add it to the critter array
   rowOccupants[cellToFill] = critterArray.length - 1; // go to the rowOccupant where we know there's a vacancy, put the id of the new one in
-  // print("new organism created ");
+  print("new organism created ");
 }
 
 function fancyCalc(hue_one, hue_two) {
@@ -255,7 +255,7 @@ function catalogUniqueRowOccupants() {
 
 function createCritters() {
   // critterArray = [];
-  //NLT: this function is only ever called once, and the array is already defined as an empty array so the above is... redundant?
+  // NLT: this function is only ever called once, and the array is already defined as an empty array so the above is... redundant?
   for (var i = 0; i < number_rows; i++) {
     let newCritter = new Critter(i);
     critterArray.push(newCritter);
@@ -264,7 +264,6 @@ function createCritters() {
 
 function createRows() {
   for (var i = 0; i < number_rows; i++) {
-    console.log("this was called");
     rowOccupants[i] = i; // each row starts out with the number of the critter occupying it
   }
 }
